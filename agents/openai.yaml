@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信小游戏交付"
+  short_description: "从想法到运行验证：优化创意、构建、调试并交付可玩的原生微信小游戏"
+  default_prompt: "Use $wechat-mini-game-delivery to refine my game idea into a validated plan, then build and verify it as a native WeChat mini game."
