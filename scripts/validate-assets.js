@@ -91,13 +91,13 @@ function validateAssets(projectDir) {
     
     entries.forEach(entry => {
       // node_modules is dev-only and never shipped in the game package
-      if (entry.name === 'node_modules') return
+      if (['node_modules', '.git'].includes(entry.name)) return
 
       const fullPath = path.join(dir, entry.name)
       
       if (entry.isDirectory()) {
         scanDir(fullPath)
-      } else {
+      } else if (entry.isFile()) {
         const size = fs.statSync(fullPath).size
         if (size > 1024 * 1024) {  // > 1MB
           largeFiles.push({ path: fullPath, size })

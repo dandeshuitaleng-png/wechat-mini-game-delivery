@@ -1,7 +1,6 @@
 ---
 name: wechat-mini-game-delivery
-description: Turn a raw game idea into a validated plan, then build, debug, optimize, and publish native WeChat mini games of any type. Use when Codex receives a game idea or rough proposal to refine and implement, must create a new WeChat mini-game project, implement gameplay features, diagnose Developer Tools errors, optimize performance, or prepare for release. Supports all game genres including puzzle, action, casual, and cultural-content games.
-agent_created: true
+description: Plan, build, debug, optimize, and verify native WeChat mini games, or prepare their release materials. Use for WeChat mini-game projects and ideas explicitly targeting that platform; ordinary mini-program pages are outside this skill.
 ---
 
 # WeChat Mini Game Delivery
@@ -14,6 +13,7 @@ Choose the narrowest mode:
 
 - **Ideate**: refine a raw idea or rough proposal into a validated, scoped plan (read `references/idea-refinement.md`), then proceed to Build once confirmed.
 - **Plan**: analyze requirements and produce a technical design, scope, and acceptance criteria.
+- **Collaborate**: combine external AI websites or tools for planning and asset production; read `references/ai-collaboration.md` and use `scripts/ai-handoff.js` for file handoffs. Preview and import reviewed assets as a new version bundle, integrate its CommonJS index, then resume Build/QA.
 - **Build**: create or modify a project and implement the requested features.
 - **Debug**: reproduce, diagnose, and fix runtime or build errors.
 - **Optimize**: improve performance, reduce package size, or enhance user experience.
@@ -41,9 +41,9 @@ For proven design baselines from 50 top-grossing games (gameplay loops, interact
 
 Read `references/idea-refinement.md` and run its four steps: restate with assumptions, score on five dimensions (hook / platform fit / feasibility / edge / monetization), repair weak spots using proven skeletons from `references/top-games/`, then emit the plan in the template it defines.
 
-- Present the plan and get the user's confirmation before writing code.
+- If the user asks only for a plan, stop at the plan. If they authorize implementation, proceed with reasonable stated assumptions; ask only for decisions that materially affect scope or cannot be inferred.
 - Carry the plan's acceptance criteria into Phase 5 verbatim.
-- If the idea changes mid-build, re-score the delta before touching code.
+- If the idea changes mid-build, update the affected scope and acceptance criteria before implementing it.
 
 ### Phase 1: Discovery and Planning
 
@@ -67,7 +67,7 @@ When arriving from Phase 0, the confirmed plan already covers the benchmarks, ob
 2. Verify `project.config.json` has correct `appid` and `projectname`.
 3. Ensure `game.json` specifies a valid `deviceOrientation` (`portrait` or `landscape`). Mini games render fullscreen and have no `window`/navigation-bar config — that belongs to mini programs. Get screen metrics at runtime via `wx.getWindowInfo()`.
 4. Set up local storage namespace unique to this game.
-5. Configure subpackages if the game has more than 3-5 levels or scenes.
+5. Choose subpackages based on measured package size and loading needs, rather than level or scene count.
 
 ### Phase 3: Implementation
 
@@ -169,7 +169,7 @@ Pre-release checklist:
 
 - Wrap `wx.setStorageSync()`/`wx.getStorageSync()` with try-catch; storage can fail.
 - Use a versioned storage schema to handle migrations.
-- Clear old save data when schema version changes.
+- Migrate versioned saves while preserving progress. Do not erase user saves to resolve a schema change without explicit authorization.
 - Provide cloud save option via `wx.cloud` if user authenticated.
 
 ## Design touch interaction
@@ -185,7 +185,7 @@ Pre-release checklist:
 ## Adapt to different screens
 
 - Use `wx.getWindowInfo()` (or fall back to the deprecated `wx.getSystemInfoSync()` on old base libraries) for screen dimensions, `pixelRatio`, and `safeArea` insets.
-- Design at the official baseline of 750×1334 logical pixels and scale proportionally to other sizes.
+- Choose a design coordinate system appropriate to the game. A 750×1334 artboard is optional; it is not the runtime logical-pixel size. Map it to window dimensions once and keep touch coordinates in the same space.
 - Calculate layout in logical pixels; multiply by `pixelRatio` for canvas rendering.
 - Test on 320×568 (iPhone SE), 375×667 (iPhone 8), 414×896 (iPhone 11), and tablet sizes.
 - Handle notch and home indicator on iPhone X and later.

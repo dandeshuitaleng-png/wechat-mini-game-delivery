@@ -140,3 +140,50 @@ Node.js 检查不能替代微信开发者工具编译，开发者工具编译也
 - 可以生成方案、代码和检查报告，但不会绕过平台审核与隐私要求
 - 外部开源项目只作为参考，使用前仍需确认许可证和素材授权
 - 发布前应至少完成 iOS 与 Android 真机验证，并核对当前微信官方规则
+
+## 开发验证
+
+修改模板或检查脚本后运行：
+
+```bash
+node tests/smoke.cjs
+```
+
+该验证覆盖模板生成、已有目录保护、默认场景绘制、前后台循环恢复、资源计数和无效配置。场景与生命周期使用模拟微信 API，不能替代微信开发者工具或真机验证。
+
+`check-performance.js` 统计源码体积预算，包含 JSON、字体等文件，排除 `.git`、`node_modules` 和项目工具配置；它尚未应用 `packOptions` 或编译转换，最终包体以开发者工具为准，也不测量帧率、内存或加载耗时。
+
+## 多个 AI 协作完成游戏
+
+新增 Collaborate 模式：策划规格 → 可玩原型与风格样板 → 外部 AI 生成素材 → 文件检查与人工审查 → 接入游戏 → 开发者工具与真机验证。
+
+```text
+使用 $wechat-mini-game-delivery，结合我已有的 AI 网站制作微信小游戏。
+先按我的游戏想法生成策划交接包、美术和声音任务，列出素材规格与提示词。
+用占位素材制作可玩原型；我下载生成素材后再检查、整合和验证。
+```
+
+第一版使用文件交接，不需要 API 密钥。示例与工具：
+
+```bash
+node scripts/ai-handoff.js init examples/quiz-handoff.json /tmp/quiz-handoff-v1
+node scripts/ai-handoff.js check /tmp/quiz-handoff-v1/manifest.json /tmp/quiz-assets
+node tests/ai-handoff.cjs
+```
+
+将素材放进 assets-root 下对应路径，填写清单中的来源、任务记录、使用条款及人工审查状态。工具检查路径、存在、体积及 PNG 文件头尺寸，并记录文件指纹；视觉、音频质量与微信运行仍需实际验收。
+
+详见 [外部 AI 协作工作流](references/ai-collaboration.md)。官方 API 自动生成和网页自动操作尚未接入。
+
+### 素材导入与回退
+
+素材人工审查后，将检查报告的 SHA-256 填入 `reviewedSha256`。导入会核对审查指纹，阻止替换后的文件沿用旧审查。
+
+```bash
+# 预览导入计划
+node scripts/ai-handoff.js import /tmp/quiz-handoff-v1/manifest.json /tmp/quiz-assets /path/to/game v1
+# 导入独立版本，拒绝覆盖
+node scripts/ai-handoff.js import /tmp/quiz-handoff-v1/manifest.json /tmp/quiz-assets /path/to/game v1 --apply
+```
+
+生成 `ai-assets/v1/index.js` 供游戏通过 CommonJS 引用，`receipt.json` 记录素材来源与版本。新版使用 v2，回退时切换代码引用到 v1；旧版本的包体需纳入发行检查。导入后继续验证加载回退、画面、声音与真实交互。

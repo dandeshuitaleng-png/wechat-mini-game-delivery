@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "title": "知识闯关示例",
+  "coreLoop": "进入关卡 → 选择答案 → 查看反馈 → 完成五题 → 结算与重玩",
+  "style": "儿童绘本风，暖米色与草绿色，圆润轮廓；同一吉祥物、光照和描边粗细",
+  "acceptance": ["五道题可完整通关，结算分数与答题记录一致", "切到后台后恢复，不重复提交答案", "窄屏上题目与选项可读且按钮可点击"],
+  "assets": [
+    { "id": "mascot", "kind": "image", "path": "images/mascot.png", "width": 512, "height": 512, "maxBytes": 512000, "prompt": "生成微笑的小书精灵，正面全身，透明背景，无文字。先产出一张参考样板，后续表情沿用该角色。" },
+    { "id": "menu-background", "kind": "image", "path": "images/menu-background.png", "width": 750, "height": 1334, "maxBytes": 1024000, "prompt": "安静明亮的乡村书屋背景，上方与中央留空用于游戏标题和按钮，无文字，不绘制交互控件。" },
+    { "id": "correct-sfx", "kind": "audio", "path": "audio/correct.mp3", "maxBytes": 204800, "prompt": "清脆温暖的答对提示音，约0.6秒，无人声，结尾干净。试听检查是否刺耳、截断或出现多余静音。" }
+  ]
+}

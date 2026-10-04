@@ -86,6 +86,16 @@ const { SceneManager } = require('./js/scene-manager')
 const game = new Game()
 const sceneManager = new SceneManager(game)
 
+game.sceneManager = sceneManager
+sceneManager.registerScene('menu', {
+  render(ctx) {
+    ctx.fillStyle = '#222222'
+    ctx.font = '20px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('Hello, WeChat Mini Game!',
+      game.systemInfo.windowWidth / 2, game.systemInfo.windowHeight / 2)
+  }
+})
 sceneManager.loadScene('menu')
 game.start()
 
@@ -127,7 +137,7 @@ wx.onShow(() => {
   }
   
   start() {
-    if (this.animationId) return // already running
+    if (this.animationId !== null) return // already running
     this.lastTime = Date.now()
     this.loop()
   }
@@ -144,16 +154,17 @@ wx.onShow(() => {
   }
   
   update(deltaTime) {
-    // Update game logic
+    if (this.sceneManager) this.sceneManager.update(deltaTime)
   }
   
   render() {
     this.ctx.fillStyle = '#ffffff'
     this.ctx.fillRect(0, 0, this.systemInfo.windowWidth, this.systemInfo.windowHeight)
+    if (this.sceneManager) this.sceneManager.render(this.ctx)
   }
   
   stop() {
-    if (this.animationId) {
+    if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
     }
@@ -174,6 +185,7 @@ module.exports = { Game }
   }
   
   loadScene(name, ...args) {
+    if (!this.scenes[name]) throw new Error('Unknown scene: ' + name)
     if (this.currentScene && this.currentScene.exit) {
       this.currentScene.exit()
     }
@@ -289,10 +301,7 @@ function initProject(projectName, template = 'basic') {
   
   console.log(`Creating project ${projectName} with template ${template}...`)
   
-  // Create project directory
-  fs.mkdirSync(projectDir, { recursive: true })
-  
-  // Create template files
+  // Validate before creating any files.
   const templateFiles = TEMPLATES[template]
   if (!templateFiles) {
     console.error(`Error: Unknown template ${template}`)
@@ -300,6 +309,8 @@ function initProject(projectName, template = 'basic') {
     process.exit(1)
   }
   
+  fs.mkdirSync(projectDir, { recursive: true })
+
   Object.entries(templateFiles).forEach(([filePath, content]) => {
     const fullPath = path.join(projectDir, filePath)
     const dir = path.dirname(fullPath)
@@ -308,6 +319,11 @@ function initProject(projectName, template = 'basic') {
       fs.mkdirSync(dir, { recursive: true })
     }
     
+    if (filePath === 'project.config.json') {
+      const config = JSON.parse(content)
+      config.projectname = path.basename(projectDir)
+      content = JSON.stringify(config, null, 2)
+    }
     fs.writeFileSync(fullPath, content)
     console.log(`  Created ${filePath}`)
   })

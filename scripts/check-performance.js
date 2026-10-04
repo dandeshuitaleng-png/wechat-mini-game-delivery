@@ -45,13 +45,13 @@ function scanDirectory(dir, extensions) {
     
     entries.forEach(entry => {
       // node_modules is dev-only and never shipped in the game package
-      if (entry.name === 'node_modules') return
+      if (['node_modules', '.git'].includes(entry.name)) return
 
       const fullPath = path.join(currentDir, entry.name)
       
       if (entry.isDirectory()) {
         scan(fullPath)
-      } else if (extensions.some(ext => entry.name.endsWith(ext))) {
+      } else if (entry.isFile() && (!extensions || extensions.some(ext => entry.name.toLowerCase().endsWith(ext)))) {
         files.push(fullPath)
       }
     })
@@ -65,6 +65,7 @@ function checkPerformance(projectDir) {
   console.log('WeChat Mini Game Performance Checker')
   console.log('='.repeat(60))
   console.log(`Project: ${projectDir}\n`)
+  console.log('Source estimate only: verify final package sizes in Developer Tools. Pack exclusions and build transformations are not applied; FPS, memory and load time are not measured.')
   
   const issues = []
   const warnings = []
@@ -81,7 +82,7 @@ function checkPerformance(projectDir) {
         .filter(Boolean)
     }
   } catch (err) {
-    // Missing or invalid game.json is reported below
+    issues.push('Cannot read game.json: ' + err.message)
   }
   // Check images
   console.log('Checking images...')
@@ -133,7 +134,8 @@ function checkPerformance(projectDir) {
   
   // Split main package vs subpackage sizes. Files under a subpackage root
   // count toward the total limit, not the 4MB main-package limit.
-  const allAssetFiles = [...imageFiles, ...audioFiles, ...jsFiles]
+  const allAssetFiles = scanDirectory(projectDir)
+    .filter(file => !['project.config.json', 'project.private.config.json'].includes(path.relative(projectDir, file)))
   const isInSubpackage = (file) => {
     const rel = path.relative(projectDir, file)
     return subpackageRoots.some(root => rel === root || rel.startsWith(root + path.sep))
@@ -141,12 +143,12 @@ function checkPerformance(projectDir) {
   const mainPackageSize = allAssetFiles
     .filter(f => !isInSubpackage(f))
     .reduce((sum, f) => sum + getFileSize(f), 0)
-  const totalSize = totalImageSize + totalAudioSize + totalJsSize
-  console.log(`\nMain package size: ${formatSize(mainPackageSize)}`)
-  console.log(`Total size (main + subpackages): ${formatSize(totalSize)}`)
+  const totalSize = allAssetFiles.reduce((sum, file) => sum + getFileSize(file), 0)
+  console.log(`\nEstimated main package source size: ${formatSize(mainPackageSize)}`)
+  console.log(`Estimated total source size (main + subpackages): ${formatSize(totalSize)}`)
 
   if (mainPackageSize > LIMITS.mainPackageSize) {
-    issues.push(`Main package exceeds 4MB limit: ${formatSize(mainPackageSize)}`)
+    issues.push(`Main package exceeds 4MB budget: ${formatSize(mainPackageSize)}`)
     warnings.push('Consider moving levels/assets into subpackages')
   }
   if (totalSize > LIMITS.totalPackageSize) {
