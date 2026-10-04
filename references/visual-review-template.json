@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "project": "填写游戏名称",
+  "version": "填写实际版本或提交号",
+  "evidence": [],
+  "checks": [
+    { "id": "style-anchor", "stage": "style", "scope": "代表画面、角色和控件样板", "status": "pending", "reviewer": "", "notes": "", "evidence": [] },
+    { "id": "asset-consistency", "stage": "asset", "scope": "已使用素材的一致性、结构、透明边缘及缩小显示", "status": "pending", "reviewer": "", "notes": "", "evidence": [] },
+    { "id": "small-screen", "stage": "scene", "scope": "小屏菜单、玩法、反馈、暂停与结算", "status": "pending", "reviewer": "", "notes": "", "evidence": [] },
+    { "id": "long-screen", "stage": "scene", "scope": "长屏安全区、长文本与加载失败状态", "status": "pending", "reviewer": "", "notes": "", "evidence": [] },
+    { "id": "motion-feedback", "stage": "scene", "scope": "真实操作中的反馈和动效", "status": "pending", "reviewer": "", "notes": "", "evidence": [] }
+  ],
+  "issues": []
+}

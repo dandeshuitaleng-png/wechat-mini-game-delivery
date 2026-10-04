@@ -1,0 +1,6 @@
+{
+  "appid": "your-appid-here",
+  "projectname": "book-quiz-quality-demo",
+  "compileType": "game",
+  "setting": { "es6": true, "minified": true }
+}

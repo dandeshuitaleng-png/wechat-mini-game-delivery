@@ -206,3 +206,27 @@ node tests/ai-handoff.cjs
 ```
 
 测试覆盖工程生成、目录保护、模拟场景绘制与前后台恢复，以及素材检查、指纹绑定、导入预览、版本保护和路径约束。模拟测试不代表微信开发者工具或真机验收通过。
+
+## 美术与视觉质量
+
+先用[美术风格模板](references/art-direction-template.md)确认主画面、角色与控件样板，再生产成套素材。按[视觉验收清单](references/visual-art-qa.md)分别检查风格、素材和真实游戏场景，记录必修问题与用户偏好。
+
+复制[截图审查报告模板](references/visual-review-template.json)到项目，填写版本、范围、审查人、证据和问题复查结果：
+
+```bash
+node scripts/check-visual-review.js /path/to/project/visual-review.json /path/to/project
+```
+
+工具核对证据指纹与报告完整性；待审、未解决问题或证据变化会失败。美感、可读性、透明边缘和真实动效仍需查看与操作，报告通过只适用于所列范围。
+
+## 自动检查与验收样例
+
+[GitHub Actions](.github/workflows/quality.yml)在 push 与 pull request 时检查 Skill 格式、文档链接、脚本语法和回归行为。分支保护需仓库管理员另外配置，工作流本身不会自动阻止合并。
+
+[书屋小闯关示例](examples/book-quiz/)提供菜单、五题答题、反馈、暂停、结算与重玩，演示占位绘制及导入图片后的加载回退。可导入微信开发者工具，并按示例中的步骤收集真实截图。当前只有模拟测试证据，实际视觉与真机状态待验。
+
+```bash
+node tests/visual-review.cjs
+node tests/book-quiz.cjs
+python tests/check-docs.py # 需要 PyYAML
+```

@@ -103,3 +103,7 @@ Word puzzle games only (see `game-types/word-puzzle.md`):
 - Touch targets are large enough for users with motor impairments.
 - Game can be played with one hand.
 - No flashing content that could trigger seizures.
+
+## Art and visual review
+
+Use [visual-art-qa.md](visual-art-qa.md) for style, asset and scene review. Record versioned evidence with [visual-review-template.json](visual-review-template.json). A passed report checker is a completeness check, not an automated visual verdict.

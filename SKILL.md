@@ -205,6 +205,8 @@ Require observable Developer Tools output, simulator content, console state, or 
 
 ## Perform visual QA
 
+For art production and review, read `references/visual-art-qa.md`. Establish the project style with `references/art-direction-template.md`; record scoped reviews using `references/visual-review-template.json` and validate evidence with `scripts/check-visual-review.js`. Keep style approval, asset review, and in-game visual acceptance separate. The checker validates declared evidence, not visual quality.
+
 Read `references/qa-checklist.md` for screenshot and interaction review.
 
 Use screenshots to inspect:
